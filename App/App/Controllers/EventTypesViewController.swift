@@ -1,48 +1,47 @@
 //
-//  EventsSearchViewController.swift
+//  EventTypesViewController.swift
 //  App
 //
-//  Created by Sonalee Shah on 2016-08-09.
+//  Created by Omid on 2016-08-22.
 //  Copyright © 2016 IBM. All rights reserved.
 //
 
 import UIKit
 
-class EventsSearchViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate {
+protocol EventTypesViewControllerDelegate {
+    
+    func eventTypesViewController(viewController: EventTypesViewController, didSelectEventType eventType: EventType)
+}
+
+class EventTypesViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
-    var events: [Event] = []
-    var hasNext: Bool = false
+    var eventTypes: [EventType] = []
+    var hasNext: Bool = true
     
-    var query: String? {
-        
-        didSet {
-            self.events = []
-            self.hasNext = self.query?.characters.count > 0
-            self.tableView.reloadData()
-        }
-    }
+    var delegate: EventTypesViewControllerDelegate?
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
+        self.navigationItem.title = NSLocalizedString("Event Types", comment: "")
         self.tableView.estimatedRowHeight = 50
     }
     
-    func getEvents(offset offset: Int) {
+    func getEventTypes() {
         
         self.hasNext = false
         
-        Event.events(self.query ?? "", offset: offset, limit: 20) { (profiles, hasNext, error) in
+        EventType.eventTypes { (eventTypes, hasNext, error) in
             
             if let error = error {
                 
                 NSLog("%@", error.localizedDescription)
                 
             } else {
-                self.events = profiles
+                self.eventTypes = eventTypes
                 self.hasNext = hasNext
                 self.tableView.reloadData()
             }
@@ -56,46 +55,43 @@ class EventsSearchViewController: BaseViewController, UITableViewDataSource, UIT
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return self.events.count + Int(self.hasNext)
+        
+        return self.eventTypes.count + Int(self.hasNext)
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         
-        if indexPath.row < self.events.count {
+        if indexPath.row < self.eventTypes.count {
             return UITableViewAutomaticDimension
         }
         return 50
     }
-
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        if indexPath.row < self.events.count {
+        if indexPath.row < self.eventTypes.count {
             
-            let cell = tableView.dequeueReusableCellWithIdentifier("EventCell", forIndexPath: indexPath) as! EventCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("EventTypeCell", forIndexPath: indexPath) as! EventTypeCell
             
-            cell.event = self.events[indexPath.row]
+            cell.eventType = self.eventTypes[indexPath.row]
             
             return cell
             
         } else {
             
             if self.hasNext {
-                self.getEvents(offset: self.events.count)
+                self.getEventTypes()
             }
             return tableView.dequeueReusableCellWithIdentifier("ActivityCell", forIndexPath: indexPath)
         }
     }
-
+    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
-        if let createProfileViewController = self.presentingViewController as? CreateProfileViewController {
-            
-            createProfileViewController.profile.event = self.events[indexPath.row]
-            createProfileViewController.tableView.reloadData()
-            
-            self.dismissViewControllerAnimated(true, completion: nil)
+        if indexPath.row < self.eventTypes.count {
+            self.delegate?.eventTypesViewController(self, didSelectEventType: self.eventTypes[indexPath.row])
         }
     }
 }

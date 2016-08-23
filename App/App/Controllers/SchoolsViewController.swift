@@ -1,49 +1,49 @@
 //
-//  EventsViewController.swift
+//  SchoolsViewController.swift
 //  App
 //
-//  Created by Sonalee Shah on 2016-08-09.
+//  Created by Omid on 2016-08-17.
 //  Copyright © 2016 IBM. All rights reserved.
 //
 
 import UIKit
 
-protocol EventsViewControllerDelegate {
+protocol SchoolsViewControllerDelegate {
     
-    func eventsViewController(viewController: EventsViewController, didSelectEvent event: Event)
+    func schoolsViewController(viewController: SchoolsViewController, didSelectSchool event: School)
 }
 
-class EventsViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+class SchoolsViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
-    var events: [Event] = []
-    var filteredEvents: [Event] = []
+    var schools: [School] = []
+    var filteredSchools: [School] = []
     var hasNext: Bool = true
     
-    var delegate: EventsViewControllerDelegate?
+    var delegate: SchoolsViewControllerDelegate?
 
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
-        self.navigationItem.title = NSLocalizedString("Events", comment: "")
+        self.navigationItem.title = NSLocalizedString("Schools", comment: "")
         self.tableView.estimatedRowHeight = 50
     }
     
-    func getEvents(offset offset: Int) {
+    func getSchools(offset offset: Int) {
         
         self.hasNext = false
         
-        Event.events(offset, limit: 100) { (events, hasNext, error) in
+        School.schools(offset, limit: 100) { (schools, hasNext, error) in
             
             if let error = error {
                 
                 NSLog("%@", error.localizedDescription)
                 
             } else {
-                self.events = events
-                self.filteredEvents = events
+                self.schools = schools
+                self.filteredSchools = schools
                 self.hasNext = hasNext
                 self.tableView.reloadData()
             }
@@ -57,32 +57,31 @@ class EventsViewController: BaseViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        
-        return self.filteredEvents.count + Int(self.hasNext)
+        return self.filteredSchools.count + Int(self.hasNext)
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         
-        if indexPath.row < self.filteredEvents.count {
+        if indexPath.row < self.filteredSchools.count {
             return UITableViewAutomaticDimension
         }
         return 50
     }
-
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        if indexPath.row < self.filteredEvents.count {
+        if indexPath.row < self.filteredSchools.count {
             
-            let cell = tableView.dequeueReusableCellWithIdentifier("EventCell", forIndexPath: indexPath) as! EventCell
-
-            cell.event = self.filteredEvents[indexPath.row]
+            let cell = tableView.dequeueReusableCellWithIdentifier("SchoolCell", forIndexPath: indexPath) as! SchoolCell
+            
+            cell.school = self.filteredSchools[indexPath.row]
             
             return cell
             
         } else {
             
             if self.hasNext {
-                self.getEvents(offset: self.filteredEvents.count)
+                self.getSchools(offset: self.filteredSchools.count)
             }
             return tableView.dequeueReusableCellWithIdentifier("ActivityCell", forIndexPath: indexPath)
         }
@@ -92,17 +91,17 @@ class EventsViewController: BaseViewController, UITableViewDataSource, UITableVi
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
-        if indexPath.row < self.filteredEvents.count {
-            self.delegate?.eventsViewController(self, didSelectEvent: self.filteredEvents[indexPath.row])
+        if indexPath.row < self.schools.count {
+            self.delegate?.schoolsViewController(self, didSelectSchool: self.schools[indexPath.row])
         }
     }
-
+    
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         
         if searchText.characters.count > 0 {
-            self.filteredEvents = self.events.filter({$0.name?.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || $0.eventType?.name?.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || $0.location?.lowercaseString.rangeOfString(searchText.lowercaseString) != nil})
+            self.filteredSchools = self.schools.filter({$0.name?.lowercaseString.rangeOfString(searchText.lowercaseString) != nil || $0.location?.lowercaseString.rangeOfString(searchText.lowercaseString) != nil})
         } else {
-            self.filteredEvents = self.events
+            self.filteredSchools = self.schools
         }
         self.tableView.reloadData()
     }

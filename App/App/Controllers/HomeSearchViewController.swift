@@ -89,5 +89,13 @@ class HomeSearchViewController: BaseViewController, UITableViewDataSource, UITab
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        if indexPath.row < self.profiles.count {
+            
+            let mainProfileViewController = UIStoryboard.viewController("MainProfileViewController") as! MainProfileViewController
+            mainProfileViewController.profile = self.profiles[indexPath.row]
+            
+            self.presentingViewController?.navigationController?.pushViewController(mainProfileViewController, animated: true)
+        }
     }
 }

@@ -104,6 +104,11 @@ class LoginViewController: BaseViewController, UITextFieldDelegate, MFMailCompos
         return true
     }
     
+    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
+        
+        return !self.activityIndicator.isAnimating()
+    }
+    
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         
         controller.dismissViewControllerAnimated(true, completion: nil)
@@ -160,6 +165,10 @@ class LoginViewController: BaseViewController, UITextFieldDelegate, MFMailCompos
             mailComposeViewController.setToRecipients(["nomid@ca.ibm.com"])
             mailComposeViewController.setSubject("Request Access")
             
+            mailComposeViewController.navigationBar.tintColor = UIColor.whiteColor()
+            mailComposeViewController.navigationBar.barTintColor = UIColor.whiteColor()
+            mailComposeViewController.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(18)]
+
             self.presentViewController(mailComposeViewController, animated: true, completion: nil)
             
         } else {
@@ -171,11 +180,11 @@ class LoginViewController: BaseViewController, UITextFieldDelegate, MFMailCompos
         }
     }
     
-    
     @IBAction func loginButtonTapped(sender: UIButton) {
         
         self.view.firstResponder()?.resignFirstResponder()
         
+        self.loginButton.enabled = false
         self.loginButton.setTitle("", forState: UIControlState.Normal)
         self.activityIndicator.startAnimating()
         
@@ -189,9 +198,11 @@ class LoginViewController: BaseViewController, UITextFieldDelegate, MFMailCompos
         self.sessionTask = User.user(email) { (user, error) in
             
             self.passwordTextField.text = nil
-            
-            self.activityIndicator.stopAnimating()
+            self.textFieldEditingChanged(self.passwordTextField)
+
+            self.loginButton.enabled = true
             self.loginButton.setTitle(NSLocalizedString("Login", comment: ""), forState: UIControlState.Normal)
+            self.activityIndicator.stopAnimating()
             
             if let error = error {
                 
@@ -201,12 +212,12 @@ class LoginViewController: BaseViewController, UITextFieldDelegate, MFMailCompos
                 
             } else if let user = user {
                 
-                if user.fullaccess {
-                    self.view.window?.rootViewController = UIStoryboard.viewController("MainViewController")
-                } else {
+                if user.accessLevel == User.AccessLevel.Editor.rawValue {
                     let viewController = UIStoryboard.viewController("CreateProfileViewController")
                     self.view.window?.rootViewController = UINavigationController(rootViewController: viewController)
-                }
+                } else {
+                    self.view.window?.rootViewController = UIStoryboard.viewController("MainViewController")
+                }                
             }
         }
     }

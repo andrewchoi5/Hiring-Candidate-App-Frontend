@@ -36,7 +36,8 @@ class HomeViewController: BaseViewController, UITableViewDataSource, UITableView
 
         self.hasNext = false
         
-        Profile.profiles(offset, limit: 20) { (profiles, hasNext, error) in
+        self.sessionTask?.cancel()
+        self.sessionTask = Profile.profiles(offset, limit: 20) { (profiles, hasNext, error) in
             
             if let error = error {
                 
@@ -90,10 +91,18 @@ class HomeViewController: BaseViewController, UITableViewDataSource, UITableView
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        if indexPath.row < self.profiles.count {
+            
+            let mainProfileViewController = UIStoryboard.viewController("MainProfileViewController") as! MainProfileViewController
+            mainProfileViewController.profile = self.profiles[indexPath.row]
+            
+            self.navigationController?.pushViewController(mainProfileViewController, animated: true)
+        }
     }
 
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        
+
         if let searchResultsController = searchController.searchResultsController as? HomeSearchViewController {
             searchResultsController.query = searchController.searchBar.text
         }

@@ -10,16 +10,17 @@ import UIKit
 
 class ProfileCell: UITableViewCell {
     
+    @IBOutlet weak var initialLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var schoolLabel: UILabel!
-    @IBOutlet weak var picImageView: UIImageView!
     @IBOutlet weak var flagView: UIView!
     
     var profile: Profile? {
         
         didSet {
-            self.nameLabel.text = (self.profile?.firstname ?? "") + " " + (self.profile?.lastname ?? "")
-            self.schoolLabel.text = self.profile?.school
+            self.initialLabel.text = String(self.profile?.firstname?.characters.first ?? " ").uppercaseString + String(self.profile?.lastname?.characters.first ?? " ").uppercaseString
+            self.nameLabel.text = self.profile?.name ?? " "
+            self.schoolLabel.text = self.profile?.school?.name ?? " "
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  CreateProfileCell.swift
+//  TextFieldCell.swift
 //  App
 //
 //  Created by Sonalee Shah on 2016-08-08.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CreateProfileCell: UITableViewCell {
+class TextFieldCell: UITableViewCell {
     
     @IBOutlet weak var textField: UITextField!
 }

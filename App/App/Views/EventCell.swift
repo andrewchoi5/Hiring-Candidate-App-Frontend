@@ -20,8 +20,8 @@ class EventCell: UITableViewCell {
             let dateFormatter = NSDateFormatter()
             dateFormatter.dateStyle = NSDateFormatterStyle.FullStyle
             
-            self.nameLabel.text = self.event?.name
-            self.typeLabel.text = self.event?.type
+            self.nameLabel.text = self.event?.name ?? " "
+            self.typeLabel.text = self.event?.eventType?.name ?? " "
             self.locationLabel.text = String(format: NSLocalizedString("%@ (%@)", comment: ""), dateFormatter.stringFromDate(self.event?.date ?? NSDate()), (self.event?.location ?? ""))
         }
     }

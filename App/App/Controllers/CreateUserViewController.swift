@@ -1,37 +1,34 @@
 //
-//  CreateProfileViewController.swift
+//  CreateUserViewController.swift
 //  App
 //
-//  Created by Omid on 2016-08-04.
+//  Created by Omid on 2016-08-22.
 //  Copyright © 2016 IBM. All rights reserved.
 //
 
 import UIKit
 
-class CreateProfileViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UIPickerViewDataSource, UIPickerViewDelegate, SchoolsViewControllerDelegate, EventsViewControllerDelegate {
+class CreateUserViewController: BaseViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-
+    
     @IBOutlet var tableViewBottom: NSLayoutConstraint!
-
-    let profile: Profile = Profile(data: NSDictionary())
-
-    var datePicker: UIDatePicker!
+    
+    let user: User = User(data: NSDictionary())
+    
+    let accessLevelTitles = ["Editor", "Moderator", "Administrator"]
+    let accessLevelValues = ["1", "2", "3"]
+    
     var pickerView: UIPickerView!
     var keyboardToolbar: UIToolbar!
-    
-    let locations = ["Calgary", "Edmonton", "Montreal", "Ottawa", "Toronto", "Vancouver"]
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
-        self.navigationItem.title = NSLocalizedString("Candidate Information", comment: "")
-        
-        self.datePicker = UIDatePicker()
-        self.datePicker.datePickerMode = UIDatePickerMode.Date
+        self.navigationItem.title = NSLocalizedString("User Information", comment: "")
         
         self.pickerView = UIPickerView()
         self.pickerView.dataSource = self
@@ -43,7 +40,7 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
         
         self.createButton.enabled = true
         self.createButton.backgroundColor = UIColor.primaryButtonColor()
-
+        
         self.keyboardToolbar = UIToolbar(frame: CGRectMake(0, 0, 100, 50))
         self.keyboardToolbar.setItems([cancelButton, flexibleSpace, doneButton], animated: false)
     }
@@ -63,7 +60,7 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
     }
-
+    
     func cancelButtonTapped(sender: UIBarButtonItem) {
         
         self.tableView.reloadData()
@@ -73,11 +70,7 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     func doneButtonTapped(sender: UIBarButtonItem) {
         
         if self.pickerView.tag == 3 {
-            self.profile.location = self.locations[self.pickerView.selectedRowInComponent(0)]
-        }
-        
-        if self.datePicker.tag == 5 {
-            self.profile.graduationDate = self.datePicker.date
+            self.user.accessLevel = self.accessLevelValues[self.pickerView.selectedRowInComponent(0)]
         }
         
         self.tableView.reloadData()
@@ -86,27 +79,24 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         
-        return 3
+        return 2
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if section == 0 {
             return 4
-        } else if section == 1 {
-            return 3
-        } else {
-            return 1
         }
+        return 1
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("TextFieldCell", forIndexPath: indexPath) as! TextFieldCell
-
+        
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateStyle = NSDateFormatterStyle.LongStyle
-        
+
         if indexPath.section == 0 {
             if indexPath.row == 0 {
                 
@@ -123,8 +113,8 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
                 cell.textField.returnKeyType = UIReturnKeyType.Done
                 cell.textField.keyboardType = UIKeyboardType.ASCIICapable
                 cell.textField.placeholder = NSLocalizedString("First Name", comment: "")
-                cell.textField.text = self.profile.firstname
-
+                cell.textField.text = self.user.name
+                
             } else if indexPath.row == 1 {
                 
                 cell.accessoryType = UITableViewCellAccessoryType.None
@@ -140,7 +130,7 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
                 cell.textField.returnKeyType = UIReturnKeyType.Done
                 cell.textField.keyboardType = UIKeyboardType.ASCIICapable
                 cell.textField.placeholder = NSLocalizedString("Last Name", comment: "")
-                cell.textField.text = self.profile.lastname
+                cell.textField.text = self.user.name
                 
             } else if indexPath.row == 2 {
                 
@@ -151,15 +141,35 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
                 cell.textField.inputView = nil
                 cell.textField.inputAccessoryView = nil
                 cell.textField.userInteractionEnabled = true
+                cell.textField.autocapitalizationType = UITextAutocapitalizationType.Words
+                cell.textField.autocorrectionType = UITextAutocorrectionType.No
+                cell.textField.spellCheckingType = UITextSpellCheckingType.No
+                cell.textField.returnKeyType = UIReturnKeyType.Done
+                cell.textField.keyboardType = UIKeyboardType.ASCIICapable
+                cell.textField.placeholder = NSLocalizedString("Role", comment: "")
+                cell.textField.text = self.user.name
+                
+            } else if indexPath.row == 3 {
+                
+                cell.accessoryType = UITableViewCellAccessoryType.None
+                cell.selectionStyle = UITableViewCellSelectionStyle.None
+                
+                cell.textField.tag = 3
+                cell.textField.inputView = nil
+                cell.textField.inputAccessoryView = nil
+                cell.textField.userInteractionEnabled = true
                 cell.textField.autocapitalizationType = UITextAutocapitalizationType.None
                 cell.textField.autocorrectionType = UITextAutocorrectionType.No
                 cell.textField.spellCheckingType = UITextSpellCheckingType.No
                 cell.textField.returnKeyType = UIReturnKeyType.Done
                 cell.textField.keyboardType = UIKeyboardType.EmailAddress
-                cell.textField.placeholder = NSLocalizedString("Email", comment: "")
-                cell.textField.text = self.profile.email
+                cell.textField.placeholder = NSLocalizedString("IBM Email", comment: "")
+                cell.textField.text = self.user.email
                 
-            } else if indexPath.row == 3 {
+            }
+        } else if indexPath.section == 1 {
+            
+            if indexPath.row == 0 {
                 
                 cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
@@ -168,69 +178,8 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
                 cell.textField.inputView = self.pickerView
                 cell.textField.inputAccessoryView = self.keyboardToolbar
                 cell.textField.userInteractionEnabled = true
-                cell.textField.placeholder = NSLocalizedString("Location", comment: "")
-                cell.textField.text = self.profile.location
-            }
-        } else if indexPath.section == 1 {
-            if indexPath.row == 0 {
-                
-                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-                cell.selectionStyle = UITableViewCellSelectionStyle.Gray
-                
-                cell.textField.tag = 4
-                cell.textField.inputView = nil
-                cell.textField.inputAccessoryView = nil
-                cell.textField.userInteractionEnabled = false
-                cell.textField.placeholder = NSLocalizedString("School", comment: "")
-                cell.textField.text = self.profile.school?.name
-                
-            } else if indexPath.row == 1 {
-
-                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-                cell.selectionStyle = UITableViewCellSelectionStyle.None
-                
-                cell.textField.tag = 5
-                cell.textField.inputView = self.datePicker
-                cell.textField.inputAccessoryView = self.keyboardToolbar
-                cell.textField.userInteractionEnabled = true
-                cell.textField.placeholder = NSLocalizedString("Graduation Date", comment: "")
-                
-                if let graduationDate = self.profile.graduationDate {
-                    cell.textField.text = dateFormatter.stringFromDate(graduationDate)
-                } else {
-                    cell.textField.text = nil
-                }
-
-            } else if indexPath.row == 2 {
-                
-                cell.accessoryType = UITableViewCellAccessoryType.None
-                cell.selectionStyle = UITableViewCellSelectionStyle.None
-                
-                cell.textField.tag = 6
-                cell.textField.inputView = nil
-                cell.textField.inputAccessoryView = nil
-                cell.textField.userInteractionEnabled = true
-                cell.textField.autocapitalizationType = UITextAutocapitalizationType.Words
-                cell.textField.autocorrectionType = UITextAutocorrectionType.No
-                cell.textField.spellCheckingType = UITextSpellCheckingType.No
-                cell.textField.returnKeyType = UIReturnKeyType.Done
-                cell.textField.keyboardType = UIKeyboardType.ASCIICapable
-                cell.textField.placeholder = NSLocalizedString("Degree", comment: "")
-                cell.textField.text = self.profile.degree
-            }
-        } else if indexPath.section == 2 {
-            if indexPath.row == 0 {
-                
-                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-                cell.selectionStyle = UITableViewCellSelectionStyle.Gray
-                
-                cell.textField.tag = 7
-                cell.textField.inputView = nil
-                cell.textField.inputAccessoryView = nil
-                cell.textField.userInteractionEnabled = false
-                cell.textField.placeholder = NSLocalizedString("Event", comment: "")
-                cell.textField.text = self.profile.event?.name
-                cell.textField.tag = indexPath.row
+                cell.textField.placeholder = NSLocalizedString("Access Level", comment: "")
+                cell.textField.text = self.accessLevelTitles[self.accessLevelValues.indexOf(self.user.accessLevel ?? "1") ?? 0]
             }
         }
         
@@ -240,29 +189,6 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        
-        if indexPath.section == 0 {
-            
-        } else if indexPath.section == 1 {
-            if indexPath.row == 0 {
-                
-                let schoolsViewController = UIStoryboard.viewController("SchoolsViewController") as! SchoolsViewController
-                schoolsViewController.delegate = self
-                
-                let navigationController = UINavigationController(rootViewController: schoolsViewController)
-                self.presentViewController(navigationController, animated: true, completion: nil)
-                
-            }
-        } else if indexPath.section == 2 {
-            if indexPath.row == 0 {
-                
-                let eventsViewController = UIStoryboard.viewController("EventsViewController") as! EventsViewController
-                eventsViewController.delegate = self
-                
-                let navigationController = UINavigationController(rootViewController: eventsViewController)
-                self.presentViewController(navigationController, animated: true, completion: nil)
-            }
-        }
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -274,29 +200,26 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
         
-        self.datePicker.tag = textField.tag
         self.pickerView.tag = textField.tag
         self.pickerView.reloadAllComponents()
-
-        if textField.tag == 3 {
-            self.pickerView.selectRow(self.locations.indexOf(textField.text ?? "") ?? 0, inComponent: 0, animated: false)
-        } else if textField.tag == 5 {
-            self.datePicker.date = self.profile.graduationDate ?? NSDate()
+        
+        if textField.tag == 4 {
+            self.pickerView.selectRow(self.accessLevelTitles.indexOf(textField.text ?? "") ?? 0, inComponent: 0, animated: false)
         }
-
+        
         return !self.activityIndicator.isAnimating()
     }
     
     func textFieldShouldEndEditing(textField: UITextField) -> Bool {
         
         if textField.tag == 0 {
-            self.profile.firstname = textField.text
+            self.user.firstname = textField.text
         } else if textField.tag == 1 {
-            self.profile.lastname = textField.text
+            self.user.lastname = textField.text
         } else if textField.tag == 2 {
-            self.profile.email = textField.text
-        } else if textField.tag == 6 {
-            self.profile.degree = textField.text
+            self.user.role = textField.text
+        } else if textField.tag == 3 {
+            self.user.email = textField.text
         }
         self.tableView.reloadData()
         
@@ -310,8 +233,8 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         
-        if pickerView.tag == 3 {
-            return self.locations.count
+        if pickerView.tag == 4 {
+            return self.accessLevelTitles.count
         } else {
             return 0
         }
@@ -319,8 +242,8 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
     
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
-        if pickerView.tag == 3 {
-            return self.locations[row]
+        if pickerView.tag == 4 {
+            return self.accessLevelTitles[row]
         } else {
             return ""
         }
@@ -330,7 +253,7 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
         
         if let userInfo = notification.userInfo,
             let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
-
+            
             UIView.beginAnimations(nil, context: nil)
             UIView.setAnimationBeginsFromCurrentState(true)
             UIView.setAnimationDuration((userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0)
@@ -359,41 +282,25 @@ class CreateProfileViewController: BaseViewController, UITableViewDataSource, UI
         }
     }
     
-    func schoolsViewController(viewController: SchoolsViewController, didSelectSchool school: School) {
-        
-        viewController.dismissViewControllerAnimated(true, completion: nil)
-        
-        self.profile.school = school
-        self.tableView.reloadData()
-    }
-    
-    func eventsViewController(viewController: EventsViewController, didSelectEvent event: Event) {
-        
-        viewController.dismissViewControllerAnimated(true, completion: nil)
-        
-        self.profile.event = event
-        self.tableView.reloadData()
-    }
-
     @IBAction func createButtonTapped(sender: UIButton) {
         
         self.view.firstResponder()?.resignFirstResponder()
-
+        
         self.createButton.enabled = true
         self.createButton.setTitle("", forState: UIControlState.Normal)
         self.activityIndicator.startAnimating()
-
+        
         self.sessionTask?.cancel()
-        self.sessionTask = self.profile.create { (error) in
-
+        self.sessionTask = self.user.create { (error) in
+            
             self.createButton.enabled = true
             self.createButton.setTitle(NSLocalizedString("Create", comment: ""), forState: UIControlState.Normal)
             self.activityIndicator.stopAnimating()
-
+            
             if let error = error {
                 let alertController = UIAlertController(title: NSLocalizedString("Error", comment: ""), message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.Alert)
                 alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: UIAlertActionStyle.Default, handler: nil))
-                    
+                
                 self.presentViewController(alertController, animated: true, completion: nil)
             } else {
                 self.navigationController?.popViewControllerAnimated(true)

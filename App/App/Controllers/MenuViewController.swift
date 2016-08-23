@@ -17,7 +17,7 @@ class MenuViewController: BaseViewController, UITableViewDataSource, UITableView
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return 3
+        return 5
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -27,8 +27,12 @@ class MenuViewController: BaseViewController, UITableViewDataSource, UITableView
         if indexPath.row == 0 {
             cell.titleLabel.text = NSLocalizedString("Home", comment: "")
         } else if indexPath.row == 1 {
-            cell.titleLabel.text = NSLocalizedString("Resources", comment: "")
+            cell.titleLabel.text = NSLocalizedString("Create Event", comment: "")
         } else if indexPath.row == 2 {
+            cell.titleLabel.text = NSLocalizedString("Create User", comment: "")
+        } else if indexPath.row == 3 {
+            cell.titleLabel.text = NSLocalizedString("Resources", comment: "")
+        } else if indexPath.row == 4 {
             cell.titleLabel.text = NSLocalizedString("Marketing", comment: "")
         }
         
@@ -43,10 +47,11 @@ class MenuViewController: BaseViewController, UITableViewDataSource, UITableView
             let viewController = UIStoryboard.viewController("HomeViewController")
             self.mainViewController?.navController.viewControllers = [viewController]
         } else if indexPath.row == 1 {
-            let viewController = UIStoryboard.viewController("ResourcesViewController")
+            let viewController = UIStoryboard.viewController("CreateEventViewController")
             self.mainViewController?.navController.viewControllers = [viewController]
         } else if indexPath.row == 2 {
-
+            let viewController = UIStoryboard.viewController("CreateUserViewController")
+            self.mainViewController?.navController.viewControllers = [viewController]
         }
         
         self.mainViewController?.closeMenuAnimated(true)

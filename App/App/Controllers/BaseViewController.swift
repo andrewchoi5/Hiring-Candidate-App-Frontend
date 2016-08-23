@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BaseViewController: UIViewController {
+class BaseViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var sessionTask: NSURLSessionTask?
 
@@ -30,20 +30,28 @@ class BaseViewController: UIViewController {
         
         super.viewDidLoad()
         
-        self.navigationController?.navigationBar.translucent = true
+        self.navigationController?.navigationBar.translucent = false
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.barTintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(18)]
-        
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = self
+
         if self.presentingViewController != nil {
             self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "Close"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(BaseViewController.closeButtonTapped(_:)))
         } else if self.navigationController?.viewControllers.count == 1 {
             self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "Menu"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(BaseViewController.menuButtonTapped(_:)))
         } else if self.navigationController?.viewControllers.count > 1 {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "Back"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(BaseViewController.backButtonTapped(_:)))
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "ArrowLeft"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(BaseViewController.backButtonTapped(_:)))
         }
     }
+    
+    override func viewWillDisappear(animated: Bool) {
         
+        super.viewWillDisappear(animated)
+        
+        self.view.firstResponder()?.resignFirstResponder()
+    }
+    
     func menuButtonTapped(sender: UIBarButtonItem) {
         
         self.mainViewController?.openMenuAnimated(true)
